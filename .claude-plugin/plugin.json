@@ -9,5 +9,6 @@
   "homepage": "https://github.com/manavpurswani/claude-wrap-up",
   "repository": "https://github.com/manavpurswani/claude-wrap-up",
   "license": "MIT",
-  "keywords": ["handoff", "dev-log", "session", "context", "continuity"]
+  "icon": ".claude-plugin/icon.png",
+  "keywords": ["handoff", "dev-log", "session", "context", "continuity", "claude-code", "secret-scanning"]
 }

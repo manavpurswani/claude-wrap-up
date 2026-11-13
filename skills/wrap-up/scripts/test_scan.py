@@ -37,7 +37,7 @@ class Detects(unittest.TestCase):
 
     def test_credentialed_url_reported_once(self):
         # Previously also reported the user:pass@host as an email.
-        self.assertEqual(categories("postgres://admin:hunter2pw@db.internal:5432/app"), ["secret"])
+        self.assertEqual(categories("postgres://admin:" + "pw" * 5 + "@db.internal:5432/app"), ["secret"])
 
     def test_generic_assignment(self):
         self.assertEqual(categories("API_KEY=" + "q7Zk" * 5), ["possible-secret"])

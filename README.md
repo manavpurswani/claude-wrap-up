@@ -1,12 +1,19 @@
 # wrap-up
 
-A Claude Code skill for ending a long session without losing anything.
+**Your Claude Code session ends. The context doesn't have to.**
 
 Run `/wrap-up` before you close a session you'll want to come back to. Claude
 writes down everything that happened (what changed, why, what was decided,
-what's still broken) into your project's own git repo, checks what's actually
-committed and pushed, and hands you a short prompt to paste into the next
-session so it starts with full context instead of from zero.
+what's still broken) into your project's own git repo as an append-only dev
+log, scans it for secrets and personal details before it can reach a public
+repo, checks what's actually committed and pushed, and hands you a short
+prompt to paste into the next session so it starts with full context instead
+of from zero.
+
+```
+/plugin marketplace add manavpurswani/claude-wrap-up
+/plugin install wrap-up@claude-wrap-up
+```
 
 ## Why
 
@@ -234,6 +241,23 @@ course corrections, or loose ends.
 - Optional: `python3` (for the secret scanner; without it Claude does the check
   by reading) and the `gh` CLI (to confirm whether a repo is public; without it
   the repo is treated as public to be safe).
+
+## What it runs, reads and sends
+
+Everything is local and visible in this repo. There is no telemetry and no
+server.
+
+- **Writes:** only `docs/dev-log/` and `HANDOFF.md` in your repo, plus
+  temporary drafts in a system temp folder that it deletes afterwards.
+- **Reads:** your repo's git state and recent dev-log entries, and, to
+  gather your standing rules, `CLAUDE.md` files and Claude's memory notes.
+- **Runs:** `git` (status, log, diff, remote), and your own commit only after
+  you approve it. It never pushes. It also runs two bundled Python scripts,
+  `scripts/scan.py` and `scripts/verify.py`, which only read the files they
+  are pointed at.
+- **Network:** at most one call, `gh repo view`, to ask GitHub whether the
+  repo is public. It's skipped if `gh` isn't installed, and the repo is then
+  treated as public to be safe. Nothing from your session is sent anywhere.
 
 ## What's in this repo
 

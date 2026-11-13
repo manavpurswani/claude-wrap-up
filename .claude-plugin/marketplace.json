@@ -4,6 +4,7 @@
     "name": "Manav Purswani",
     "url": "https://github.com/manavpurswani"
   },
+  "description": "A Claude Code skill that writes an append-only dev log into your repo at the end of a session, scans it for secrets, and hands the next session a ready prompt.",
   "plugins": [
     {
       "name": "wrap-up",
