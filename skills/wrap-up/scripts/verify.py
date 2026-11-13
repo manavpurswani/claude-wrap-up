@@ -135,6 +135,8 @@ def verify(root):
         else:
             if latest[:-3] not in prompt:
                 problems.append(("ERROR", "HANDOFF.md", "continuation prompt does not name the latest entry"))
+            if "push" not in prompt.lower():
+                problems.append(("WARN", "HANDOFF.md", "continuation prompt says nothing about pushing; add the push policy line"))
             if len(prompt.splitlines()) > PROMPT_WARN_LINES:
                 problems.append(("WARN", "HANDOFF.md", f"continuation prompt is over {PROMPT_WARN_LINES} lines; trim it"))
         if len(handoff.splitlines()) > HANDOFF_WARN_LINES:

@@ -235,6 +235,9 @@ this: "Nothing is blocking — pick up with next-step 1 below.">
 Standing rules for this work: <the rules from the paragraph below — or, if
 there are none that apply, omit this line entirely>.
 
+Push policy: the wrap-up never pushes, so nothing here has been published.
+Don't push anything unless I ask in that session.
+
 Before anything else, run `git status` and `git log --oneline <base hash>..HEAD`.
 If the repo has moved in ways HANDOFF.md doesn't mention, tell me first.
 
@@ -399,8 +402,15 @@ If they say yes:
    staged is left alone (this is tested: an unrelated pre-staged file stays
    staged and out of the commit):
    `git commit -m "wrap-up: <short summary>" -- docs/dev-log HANDOFF.md`
-4. Don't push. Say that it's committed locally and not pushed; pushing is a
-   separate decision, and doubly so for a public repo.
+4. Don't push — **approval to commit is not approval to push**, and that
+   holds for the rest of the session too. Say that it's committed locally
+   and not pushed; pushing is a separate decision, and doubly so for a
+   public repo. The continuation prompt carries this rule forward (step 6)
+   so the next session doesn't push the wrap-up files either. Then check
+   `git status -sb` once: if it shows the branch is *not* ahead of its
+   upstream, something else (an editor's auto-sync, a hook) published the
+   commit; tell the person, because the privacy check can't protect what an
+   outside tool pushes unreviewed.
 
 If they say no, leave the files in place, and say plainly that the log is
 currently uncommitted and not safe against loss. With more than one repo,

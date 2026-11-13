@@ -12,7 +12,10 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import verify  # noqa: E402
 
-PROMPT = "Continue work on demo. First read HANDOFF.md, then docs/dev-log/2026-11-12-01.md.\nThen: do the thing."
+PROMPT = (
+    "Continue work on demo. First read HANDOFF.md, then docs/dev-log/2026-11-12-01.md.\n"
+    "Push policy: the wrap-up never pushes. Don't push unless I ask.\nThen: do the thing."
+)
 
 
 def handoff(base, entry="2026-11-12-01", prompt=PROMPT):
@@ -141,6 +144,12 @@ class VerifyTests(unittest.TestCase):
         self.r.write("docs/dev-log/2026-11-12-01.md", "first\n")
         self.r.write("HANDOFF.md", handoff("none").replace("Based on: main@none", "Based on: no commits yet"))
         self.assertEqual(self.r.problems(), [])
+
+    def test_prompt_without_push_policy_warns_but_passes(self):
+        base = self.r.base()
+        self.r.write("HANDOFF.md", handoff(base, prompt="Continue. Read docs/dev-log/2026-11-12-01.md.\nThen: go."))
+        self.assertEqual(self.r.errors(), [])
+        self.assertTrue(any(level == "WARN" and "push" in m for level, _, m in self.r.problems()))
 
     def test_oversized_prompt_warns_but_passes(self):
         base = self.r.base()
