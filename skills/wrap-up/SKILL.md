@@ -382,6 +382,14 @@ them in the message and branch.
 
 If they say yes:
 
+0. **Check who the commit will be authored as.** A commit carries the git
+   config email permanently. Compare `git config user.email` with the author
+   of the repo's existing commits (`git log -3 --format=%ae`). In a public or
+   unknown repo, if the repo's history uses a noreply address (or a different
+   one) and the config would introduce a new, personal-looking address, stop
+   and tell the person before committing: that email would be published with
+   the history. Don't change their git config unasked; offer to commit with
+   the address the repo already uses.
 1. Confirm step 8's `verify.py` passed on the files exactly as they now sit
    in the repo; if anything has changed since, run it again. It includes the
    final scanner pass over what's actually about to be committed.
