@@ -7,10 +7,10 @@
   "description": "A Claude Code skill that writes an append-only dev log into your repo at the end of a session, scans it for secrets, and hands the next session a ready prompt.",
   "plugins": [
     {
-      "name": "wrap-up",
+      "name": "keepsession",
       "source": "./",
       "description": "End a Claude Code session without losing anything: an append-only dev log in your repo, a regenerated handoff, an honest git audit, and a paste-ready prompt for the next session.",
-      "version": "1.1.1"
+      "version": "1.2.0"
     }
   ]
 }

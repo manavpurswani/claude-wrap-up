@@ -2,7 +2,8 @@
 
 **Your Claude Code session ends. The context doesn't have to.**
 
-Run `/wrap-up` before you close a session you'll want to come back to. Claude
+Run `/keepsession:wrap-up` (or just say "wrap up this session") before you
+close a session you'll want to come back to. Claude
 writes down everything that happened (what changed, why, what was decided,
 what's still broken) into your project's own git repo as an append-only dev
 log, scans it for secrets and personal details before it can reach a public
@@ -12,7 +13,7 @@ of from zero.
 
 ```
 /plugin marketplace add manavpurswani/claude-wrap-up
-/plugin install wrap-up@claude-wrap-up
+/plugin install keepsession@claude-wrap-up
 ```
 
 ## Why
@@ -202,7 +203,7 @@ say yes, commits both files.
 
 ```
 /plugin marketplace add manavpurswani/claude-wrap-up
-/plugin install wrap-up@claude-wrap-up
+/plugin install keepsession@claude-wrap-up
 ```
 
 **Or copy the skill in directly**, which gives you the plain `/wrap-up` command:
@@ -220,8 +221,11 @@ Restart Claude Code after installing.
 At the end of a session worth resuming:
 
 ```
-/wrap-up
+/keepsession:wrap-up
 ```
+
+(If you copied the skill in directly instead of installing the plugin, the
+command is the plain `/wrap-up`.)
 
 Or just say "wrap up this session" or "write a handoff". Then, in the next
 session, paste the prompt it gave you.
@@ -249,7 +253,7 @@ course corrections, or loose ends.
 No account or setup needed: open any git repository in Claude Code after
 doing some work, and try one of these.
 
-- `/wrap-up`
+- `/keepsession:wrap-up`
 - `wrap up this session, and emphasize the bug we didn't fix`
 - `write a dev log entry and a handoff for the next session`
 
