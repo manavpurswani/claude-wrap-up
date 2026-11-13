@@ -10,7 +10,7 @@
       "name": "wrap-up",
       "source": "./",
       "description": "End a Claude Code session without losing anything: an append-only dev log in your repo, a regenerated handoff, an honest git audit, and a paste-ready prompt for the next session.",
-      "version": "1.1.0"
+      "version": "1.1.1"
     }
   ]
 }

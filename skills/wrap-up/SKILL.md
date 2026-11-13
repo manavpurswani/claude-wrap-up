@@ -1,6 +1,6 @@
 ---
 name: wrap-up
-description: Writes a complete, permanent account of the current work session into the project's own git repo (docs/dev-log/), so nothing is lost to context compaction, a new session starting cold, or a summary that quietly drops something. Use this whenever the user runs /wrap-up, or says things like "wrap up this session", "write a dev log entry", "create a handoff", "document what we did before I close this", "save our progress", or otherwise signals they're about to end a session they'll want to resume later with full context. This is explicitly USER-TRIGGERED ONLY — never invoke it proactively based on context length, a sense that the session "feels expensive" to keep going, or any other self-assessment. Only run it when the user actually asks.
+description: Writes a complete, permanent account of the current work session into the project's own git repo (docs/dev-log/), so nothing is lost to context compaction, a new session starting cold, or a summary that quietly drops something. It also scans what it writes for secrets and personal details before saving, checks its own output with a bundled verifier script, can offer (asking first) to commit just the files it wrote, and never pushes. Needs a local git repository and shell access, as in Claude Code; without a repo it says so and stops. Use this whenever the user runs /wrap-up, or says things like "wrap up this session", "write a dev log entry", "create a handoff", "document what we did before I close this", "save our progress", or otherwise signals they're about to end a session they'll want to resume later with full context. This is explicitly USER-TRIGGERED ONLY — never invoke it proactively based on context length, a sense that the session "feels expensive" to keep going, or any other self-assessment. Only run it when the user actually asks.
 ---
 
 # Wrap-up: the session's permanent record
@@ -109,14 +109,14 @@ it rather than repeating it:
   comparison fail with `fatal:` errors. That's an answer, not a problem:
   record "no commits yet", skip the comparison, and note that the wrap-up
   commit in step 9 would be the repo's first.
-- **Whether the repo is public.** Find out, don't guess:
-  `gh repo view --json visibility,isPrivate` works when `gh` is installed
-  and signed in. Otherwise judge from `git remote -v` (a GitHub, GitLab or
-  Bitbucket remote with no way to confirm is *unknown*, not private). Record
-  one of three answers: **public**, **private**, or **unknown / no remote
-  yet**. Treat unknown exactly like public — the entry can't be assumed
-  private, and a local-only repo is one `git remote add` + `git push` away
-  from being published, history included.
+- **Whether the repo is public.** Don't guess, and don't look it up over the
+  network on your own: if the repo has a remote, **ask the person** whether
+  it is public or private (if they'd like it checked, they can ask you to
+  run `gh repo view --json visibility`, and only then). Record one of three
+  answers: **public**, **private**, or **unknown / no remote yet**. Treat
+  unknown exactly like public — the entry can't be assumed private, and a
+  local-only repo is one `git remote add` + `git push` away from being
+  published, history included.
 
 - **The base commit.** `git rev-parse --short HEAD` and the branch name, taken
   now, before the wrap-up's own commit exists. HANDOFF records it so a later
@@ -133,8 +133,8 @@ it rather than repeating it:
   finding out from a stranger. If it hits, see "Entries already in the log"
   in step 7.
 
-Also gather the **standing rules** for step 6 now, while you're reading —
-see there.
+Also note any **standing rules** the person has stated during this session,
+for step 6 — see there.
 
 ### 5. Draft the entry — outside the repo
 
@@ -254,33 +254,28 @@ step and the real open question for *this* repo, not a generic template. A
 continuation prompt that doesn't orient someone with zero other context is
 the one thing this step cannot afford to get wrong.
 
-**Standing rules — pull them in, don't make the person retype them.** A new
-session starts cold, and the rules someone has already stated are exactly
-what it will get wrong first ("commit straight to main", "no co-author
-trailer", "never push without asking"). Collect the ones that affect how
-work gets done in *this repo* from:
+**Standing rules — the person's own, stated by them.** A new session starts
+cold, and the rules someone has already stated are exactly what it will get
+wrong first ("commit straight to main", "no co-author trailer", "never push
+without asking"). Use only what the person actually told you:
 
-- the repo's `CLAUDE.md` and the person's global `~/.claude/CLAUDE.md`,
-- the memory index (`MEMORY.md`) and any feedback-type memories, if this
-  session has them loaded or they sit in this project's folder under
-  `~/.claude/projects/`,
-- rules the person stated out loud during this very session.
+- rules they stated out loud during this very session, and
+- their answer to one short question you ask at this point: *"Any standing
+  rules the next session should follow in this repo (commit and push
+  policy, attribution, style)? Say none to skip."*
 
-Memory is stored **per project**, so a personal rule ("commit to main, no
-co-author") may live only in a *different* project's memory and never reach
-this one. If this project has no such rules but a sibling project's memory
-holds an obviously personal, cross-project one (attribution, commit style),
-don't silently apply it and don't silently skip it: ask once whether it
-holds here too.
+**Do not go looking for rules.** Don't read Claude's memory files, memory
+indexes or other projects' folders to harvest them, and don't copy rules out
+of `CLAUDE.md`: the next session loads `CLAUDE.md` by itself, so restating it
+only adds noise. This skill carries forward what the person says for this
+handoff; it doesn't mine their history or build a profile of them, and it
+doesn't try to change how Claude behaves across sessions beyond the single
+prompt the person chooses to paste.
 
-Include the ones that change what the next session would *do*: commit and
-branch conventions, attribution and co-author lines, push and PR policy,
-tooling or style constraints for this codebase. Keep it to a few lines,
-paraphrased, each as a plain instruction. Leave out anything unrelated to
-this repo, anything already obvious from the repo's own files, and anything
-personal. Where sources disagree — a default attribution line versus the
-person saying "no co-author" — the person's explicit rule wins; say that
-rule, not the default.
+Keep what they give you to a few lines, as plain instructions, in their own
+words as closely as possible. Leave out anything unrelated to this repo and
+anything personal. If they said "none" or nothing applies, omit the line.
+Where two of their rules conflict, ask; don't pick.
 
 These lines end up in a committed file, so they go through the step 7 check
 like everything else. A rule that only makes sense by naming a private
@@ -295,7 +290,7 @@ repo looks private.
 **Run the scanner on every draft** — entry, index line, and HANDOFF:
 
 ```
-python3 -I <this skill's directory>/scripts/scan.py <draft files...>
+python3 -I "${CLAUDE_SKILL_DIR}/scripts/scan.py" <draft files...>
 ```
 
 It flags credentials (API keys, tokens, private keys, passwords in URLs),
@@ -361,7 +356,7 @@ directory once everything is in place.
 Then run the verifier from the repo root:
 
 ```
-python3 -I <this skill's directory>/scripts/verify.py
+python3 -I "${CLAUDE_SKILL_DIR}/scripts/verify.py"
 ```
 
 It checks, mechanically, what this skill promises: no unfilled

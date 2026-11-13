@@ -45,7 +45,7 @@ Each wrap-up:
 3. **Audits git for real:** uncommitted work, missing remotes, unpushed
    branches, branches that look merged but aren't. It reports what's true,
    not what seems likely.
-4. **Checks whether the repo is public**, and treats "can't tell" as public.
+4. **Asks whether the repo is public**, and treats "can't tell" as public.
 5. Drafts the new entry outside your repo: concrete file paths, the reasoning
    behind non-obvious changes, decisions that never produced code, open bugs,
    and conversations that didn't resolve.
@@ -60,9 +60,9 @@ Each wrap-up:
    `HANDOFF.md` with a **continuation prompt**: a block of text you paste as
    the first message of your next session. It names the one question that
    needs answering first (or says nothing is blocking), the concrete next
-   step, and your **standing rules** for the repo (commit to main, no
-   co-author line, never push) pulled from your `CLAUDE.md`, memory, and what
-   you said in the session, so you don't retype them.
+   step, and any **standing rules** you give it for the repo (commit to main,
+   no co-author line, never push). It asks you once, and uses only what you
+   say; it doesn't go through your memory or config files.
 8. **Runs a verifier** (`scripts/verify.py`) over what it just wrote: no
    leftover placeholders, the index and handoff point at the new entry, the
    prompt names it, and **no existing entry or index line was edited or
@@ -238,9 +238,27 @@ course corrections, or loose ends.
 - Claude Code
 - A git repository. It stops and tells you if there isn't one, because a log
   that isn't version-controlled has nowhere durable to live.
-- Optional: `python3` (for the secret scanner; without it Claude does the check
-  by reading) and the `gh` CLI (to confirm whether a repo is public; without it
-  the repo is treated as public to be safe).
+- Shell access, as in Claude Code. In a chat with no repo and no shell, it
+  says so and stops.
+- Optional: `python3` (for the secret scanner and verifier; without it Claude
+  does the checks by reading) and the `gh` CLI (only if you ask it to look up
+  whether a repo is public).
+
+## Try it
+
+No account or setup needed: open any git repository in Claude Code after
+doing some work, and try one of these.
+
+- `/wrap-up`
+- `wrap up this session, and emphasize the bug we didn't fix`
+- `write a dev log entry and a handoff for the next session`
+
+## Privacy and support
+
+wrap-up collects nothing and has no server. Everything it writes goes into
+your own repository, and the scripts only read the files they are given.
+Questions, bugs and security concerns:
+[open an issue](https://github.com/manavpurswani/claude-wrap-up/issues).
 
 ## What it runs, reads and sends
 
@@ -249,15 +267,16 @@ server.
 
 - **Writes:** only `docs/dev-log/` and `HANDOFF.md` in your repo, plus
   temporary drafts in a system temp folder that it deletes afterwards.
-- **Reads:** your repo's git state and recent dev-log entries, and, to
-  gather your standing rules, `CLAUDE.md` files and Claude's memory notes.
+- **Reads:** your repo's git state and its recent dev-log entries and
+  `HANDOFF.md`. It does not read Claude's memory, your chat history, or your
+  `CLAUDE.md` files.
 - **Runs:** `git` (status, log, diff, remote), and your own commit only after
   you approve it. It never pushes. It also runs two bundled Python scripts,
   `scripts/scan.py` and `scripts/verify.py`, which only read the files they
   are pointed at.
-- **Network:** at most one call, `gh repo view`, to ask GitHub whether the
-  repo is public. It's skipped if `gh` isn't installed, and the repo is then
-  treated as public to be safe. Nothing from your session is sent anywhere.
+- **Network:** none. If you ask it to look up whether a repo is public, it
+  runs `gh repo view` on your behalf; otherwise it just asks you. Nothing from
+  your session is sent anywhere.
 
 ## What's in this repo
 
