@@ -5,6 +5,7 @@ incomplete, it's `docs/dev-log/` that's authoritative — start with
 `docs/dev-log/README.md`, then the most recent entry in `docs/dev-log/`.
 
 Last updated: {{DATE}}, after {{LATEST_ENTRY_SUMMARY}}.
+Based on: {{BRANCH}}@{{BASE_COMMIT}}
 
 ## Paste this to start the next session
 

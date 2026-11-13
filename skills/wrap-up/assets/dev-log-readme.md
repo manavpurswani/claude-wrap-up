@@ -22,6 +22,13 @@ wrong or incomplete, a later entry corrects it — the old one stays as-is,
 because that's what makes "nothing is silently lost" actually true rather than
 a promise. `INDEX.md` is a one-line-per-entry list, also append-only.
 
+**One exception:** if a secret (an API key, a token, a password) or a private
+personal detail ever lands in an entry, it is removed in place and replaced
+with `[redacted: what it was]`, and a newer entry records that this was done.
+The log's purpose is to preserve context, not to hold credentials. Git history
+still contains the old text, so anything that was pushed should be treated as
+exposed and rotated.
+
 ## What goes in an entry
 
 Not a chronological transcript — a complete account, organized for someone
